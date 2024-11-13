@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #hidden{
+            display: none;
+        }
+        #show{
+            display:contents;
+            border-collapse: collapse;
+        }
+        .usertable {
+            margin-top: 120px;
+            border-collapse: collapse;
+            padding: 0;
+        }
+
+        tr td {
+            padding: 0;
+        }
+
+        .usertable :first-child {
+            padding: 0 10px;
+            align-items: center;
+        }
+
+        tr td {
+            padding: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: antiquewhite;
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>price date</h1>
+    <ul></ul>
+    <br>
+    <br><hr>
+    <!-- Practice exercise - Create a form that submits user input to a dummy API and displays the response. -->
+     <h2>Insert  data with post request</h2>
+     <br>
+    <form action="" class="form">
+        <input type="text" name="username" placeholder="username" id="un" required autocomplete="on">
+        <input type="text" name="Password" placeholder="password" id="pass" required autocomplete="on">
+        <button type="submit">submit</button>
+    </form>
+    <br><br>
+    <table border="1" class="posttable" id="hidden">
+    
+        <thead>
+            <th>Username</th>
+            <th>Password</th>
+        </thead>
+        <tbody id="post-row"></tbody>
+    </table>
+    
+    <table border="1" class="usertable">
+        <caption>
+            <H1>user information</H1>
+        </caption>
+        <thead>
+            <th>Id</th>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Image</th>
+        </thead>
+        <tbody id="tablerow"></tbody>
+    </table>
+<br><br>
+
+
+
+    <script>
+        //api
+        async function get_fact() {
+            let url = "https://dogapi.dog/api/v2/breeds";
+            let response = await fetch(url);
+            if (!response.ok) throw new Error("status is not okay");
+            console.log(response);
+            let data = await response.json();
+            console.log(data.text);
+        }
+        get_fact();
+
+        // get random pricedate 
+        async function get_price(){
+        
+        let response1= await fetch("https://api.api-ninjas.com/v1/earningscalendar?ticker=MSFT");
+        // console.log(response1);
+        let data1= await response1.json();
+        // console.log(data1);
+        data1.forEach(date => {
+            const price=`<li>${date.pricedate}</li>`;
+            document.querySelector('ul').insertAdjacentHTML('beforeend',price);
+        });
+        }
+        get_price();
+
+
+        //usser information get from api
+        async function user_data() {
+            let response = await fetch("https://dummyjson.com/users");
+            // console.log(response);
+            let data = await response.json();
+            // console.log(data);
+            let user = data.users;
+            let row = '';
+            user.forEach(user_info => {
+                row += `<tr><td>${user_info.id}</td><td>${user_info.firstName}</td><td>${user_info.lastName}</td><td>${user_info.email}</td><td>${user_info.username}</td>
+        <td>${user_info.password}</td><td><img src="${user_info.image}" hieght="100px" width="100px" /></td></tr>`;
+
+            })
+            document.getElementById('tablerow').innerHTML = row;
+        }
+        user_data();
+
+        //post data from form
+        const forme1 = document.querySelector('.form');
+        forme1.addEventListener('submit', event => {
+            event.preventDefault();
+            const fromdata=new FormData(forme1);//This creates a new FormData object from form element frome1
+            const data=Object.fromEntries(fromdata);//  turn this into a regular JavaScript object like  object is a key-value pair (e.g., field name and its value)
+
+            fetch("https://jsonplaceholder.typicode.com/todos", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+            .then((response) => response.json())
+            .then((json) => {
+              
+                let row1='';
+                console.log(json);
+                    row1=`<tr><td>${json.username}</td><td>${json.Password}</td></tr>`;
+                    document.querySelector("#post-row").insertAdjacentHTML('beforeend', row1);//that is append before end of post-row 
+                // document.getElementById('post-row').innerHTML = row1;
+            });
+
+        document.querySelector(".posttable").setAttribute('id','show');
+        })
+       
+        async function fetchtwo() {
+            console.log("fetch array")
+            const result=await Promise.allSettled([
+                fetch("https://meowfacts.herokuapp.com/"),
+                fetch(" https://meowfacts.herokuapp.com/?lang=ukr")
+
+            ].map(Promise=>Promise.catch(Error=>Error) ))
+            // let value1=result.json();
+            console.log(result);
+        }
+        fetchtwo();
+         </script>
+</body>
+
+</html>
